@@ -7,10 +7,10 @@ ifeq ($(ENV),default)
 endif
 
 build: FORCE
-	uv run apio build -e $(ENV)
+	apio build -e $(ENV)
 
 clean: FORCE
-	uv run apio clean -e $(ENV)
+	apio clean
 
 program: build FORCE
 	openFPGALoader $(OPENFPGALOADER_PARAMS) _build/$(ENV)/hardware.bit
