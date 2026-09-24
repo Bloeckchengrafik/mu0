@@ -1,3 +1,6 @@
+`ifndef COMMON_SV
+`define COMMON_SV
+
 package common_pkg;
     typedef enum logic [3:0] {
         CLK_OFF        = 4'd0,
@@ -7,3 +10,5 @@ package common_pkg;
         CLK_MANUAL_ON  = 4'd4
     } clk_mode_t;
 endpackage
+
+`endif

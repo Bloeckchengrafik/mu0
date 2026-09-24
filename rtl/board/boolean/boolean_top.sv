@@ -1,10 +1,12 @@
 `default_nettype none
-import common_pkg::*;
+`include "../../src/common.sv"
 
-module boolean_top (
+module boolean_top #(
+    parameter logic [24:0] UART_DELAY_FRAMES = 25'd868 // 100 MHz / 115200 baud
+) (
     input  logic       clk,
-    input  logic       uart_rx,
-    output logic       uart_tx,
+    input  logic       UART_rxd,
+    output logic       UART_txd,
     output logic [5:0] led
 );
 
@@ -18,7 +20,7 @@ module boolean_top (
     logic        done;
     logic        start;
     logic [15:0] ir;
-    clk_mode_t  clkMode;
+    common_pkg::clk_mode_t clkMode;
 
     logic [15:0] dbgPc;
     logic [15:0] dbgAcc;
@@ -52,10 +54,12 @@ module boolean_top (
     assign led[4] = ~ir[13];
     assign led[5] = ~ir[12];
 
-    uart uart_inst (
+    uart #(
+        .DELAY_FRAMES(UART_DELAY_FRAMES)
+    ) uart_inst (
         .clk(clk),
-        .uart_rx(uart_rx),
-        .uart_tx(uart_tx),
+        .uart_rx(UART_rxd),
+        .uart_tx(UART_txd),
         .overrideMemControl(overrideMemControl),
         .overrideMemRnW(overrideMemRnW),
         .overrideMemAddr(overrideMemAddr),
@@ -86,18 +90,18 @@ module boolean_top (
     end
 
     always_ff @(posedge clk) begin
-        if (clkMode == CLK_MANUAL_ON) begin
+        if (clkMode == common_pkg::CLK_MANUAL_ON) begin
             slowClk <= 1'b1;
-        end else if (clkMode == CLK_MANUAL_OFF) begin
+        end else if (clkMode == common_pkg::CLK_MANUAL_OFF) begin
             slowClk <= 1'b0;
-        end else if (clkMode == CLK_SLOW) begin
+        end else if (clkMode == common_pkg::CLK_SLOW) begin
             if (clkCounter >= 32'd6318000) begin
                 clkCounter <= 32'd0;
                 slowClk <= ~slowClk;
             end else begin
                 clkCounter <= clkCounter + 1'b1;
             end
-        end else if (clkMode == CLK_FAST) begin
+        end else if (clkMode == common_pkg::CLK_FAST) begin
             slowClk <= ~slowClk;
         end else begin
             slowClk <= 1'b0;

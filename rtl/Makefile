@@ -1,5 +1,7 @@
 .PHONY: FORCE
 
+.DEFAULT_GOAL := build
+
 ENV ?= default
 
 ifeq ($(ENV),default)
